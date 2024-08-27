@@ -1,9 +1,15 @@
 from mmu import MMU
 
+
 class RandMMU(MMU):
     def __init__(self, frames):
-        # TODO: Constructor logic for RandMMU
-        pass
+        self.frames = frames
+        self.page_table = [None] * frames
+        self.dirty_bits = [0] * frames
+
+        self.disk_reads = 0
+        self.disk_writes = 0
+        self.page_faults = 0
 
     def set_debug(self):
         # TODO: Implement the method to set debug mode
