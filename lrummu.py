@@ -35,7 +35,7 @@ class LruMMU(MMU):
         lru_frame = 0
         lowest_timestamp = self.page_timestamps[0]
 
-        for frame_num, timestamp in enumerate(self.page_timestamps, 1):
+        for frame_num, timestamp in enumerate(self.page_timestamps):
             if timestamp < lowest_timestamp:
                 lru_frame = frame_num
                 lowest_timestamp = timestamp
