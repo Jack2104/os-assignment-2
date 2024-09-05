@@ -6,7 +6,6 @@ class RandMMU(MMU):
         self.frames = frames
         self.page_table = [None] * frames
         self.dirty_bits = [0] * frames
-        self.use_bits = [0] * frames
 
         # Pick random value for randmmu
         self.random_value = randint(0,len(self.page_table)-1)
@@ -29,7 +28,6 @@ class RandMMU(MMU):
         try:
             # Check if the page is in the table and set use bit
             page_index = self.page_table.index(page_number)
-            self.use_bits[page_index] = 1
     
         except ValueError:
             self.page_faults += 1
@@ -39,7 +37,6 @@ class RandMMU(MMU):
             # Read the page and perform operations
             self.page_table[self.random_value] = page_number
             self.disk_reads += 1
-            self.use_bits[self.random_value] = 1
             self.__change_random_value()
 
 
@@ -49,7 +46,6 @@ class RandMMU(MMU):
         try:
             # Check if the page is in the table
             page_index = self.page_table.index(page_number)
-            self.use_bits[page_index] = 1
             self.dirty_bits[page_index] = 1
 
         except ValueError:
@@ -62,7 +58,6 @@ class RandMMU(MMU):
             
             # Perform operations
             self.disk_reads += 1
-            self.use_bits[self.random_value] = 1
             self.dirty_bits[self.random_value] = 1
 
             # Change the random value
@@ -84,9 +79,7 @@ class RandMMU(MMU):
 
     def __set_frame_to_replace(self):
         # Change the random value until we find a free frame to replace
-        while (self.use_bits[self.random_value] == 1):
-            self.use_bits[self.random_value] = 0
-            self.__change_random_value()
+        self.__change_random_value()
         
     def __write_if_dirty_page(self):
        # Write to the current random value selected
