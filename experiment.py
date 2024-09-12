@@ -2,7 +2,7 @@ import gzip
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-import sys
+import json
 from clockmmu import ClockMMU
 from lrummu import LruMMU
 from randmmu import RandMMU
@@ -12,6 +12,7 @@ MAX_INCREMENTS = (
     10  # Maximum number of increments (of cache sizes) that each trace will runn
 )
 FRAME_TABLE_MULTIPLE = 1.2  # The multiple that determines any "extra" space in the maximum frame table size
+DATA_FP = "data.json"
 
 
 class Trace:
@@ -45,9 +46,11 @@ class Trace:
                 lru.write_memory(trace_cmd[0])
                 clock.write_memory(trace_cmd[0])
 
-        rand_fault_rate = rand.get_total_page_faults() / self.NumMemoryAccesses()
-        lru_fault_rate = lru.get_total_page_faults() / self.NumMemoryAccesses()
-        clock_fault_rate = clock.get_total_page_faults() / self.NumMemoryAccesses()
+        rand_fault_rate = rand.get_total_page_faults() / self.NumMemoryAccesses() * 100
+        lru_fault_rate = lru.get_total_page_faults() / self.NumMemoryAccesses() * 100
+        clock_fault_rate = (
+            clock.get_total_page_faults() / self.NumMemoryAccesses() * 100
+        )
 
         self.rand_results.append(rand_fault_rate)
         self.lru_results.append(lru_fault_rate)
@@ -67,6 +70,30 @@ class Trace:
 
         plt.savefig(f"{self.name}_plot.png", bbox_inches="tight")
         plt.close()
+
+
+def plot_results(name, data_fp):
+    data = {}
+
+    with open(data_fp, "r") as data_file:
+        data = json.load(data_file)
+
+    increments = data[name]["increments"]
+    rand_results = data[name]["rand"]
+    lru_results = data[name]["lru"]
+    clock_results = data[name]["clock"]
+
+    plt.plot(increments, rand_results, label="rand")
+    plt.plot(increments, lru_results, label="lru")
+    plt.plot(increments, clock_results, label="clock")
+
+    plt.title(name)
+    plt.xlabel("Frame Count")
+    plt.ylabel("Page Fault Rate (%)")
+    plt.legend(loc="upper right")
+
+    plt.savefig(f"{name}_plot.png", bbox_inches="tight")
+    plt.close()
 
 
 file_names = ["bzip", "sixpack", "swim", "gcc"]
@@ -89,6 +116,7 @@ for file_name in file_names:
 
     traces.append(Trace(file_name, np.array(curr_traces)))
 
+data = {}
 
 # Loop through each trace
 for trace in traces:
@@ -114,10 +142,20 @@ for trace in traces:
 
         trace.collect_results(frame_count)
 
-    print("| ")
+    data[trace.name] = {
+        "increments": trace.increments,
+        "rand": trace.rand_results,
+        "lru": trace.lru_results,
+        "clock": trace.clock_results,
+    }
+
+    with open(DATA_FP, "w") as f:
+        json.dump(data, f, indent=4)
+
+    print("\n| ")
     print("| saving plot...")
 
-    trace.plot_results()
+    # plot_results(trace.name, DATA_FP)
 
     print("-> done!")
 
