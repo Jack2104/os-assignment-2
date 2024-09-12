@@ -149,13 +149,15 @@ for trace in traces:
         "clock": trace.clock_results,
     }
 
-    with open(DATA_FP, "w") as f:
+    data_fp = trace.name + "_data.json"
+
+    with open(data_fp, "w") as f:
         json.dump(data, f, indent=4)
 
     print("\n| ")
     print("| saving plot...")
 
-    # plot_results(trace.name, DATA_FP)
+    # plot_results(trace.name, data_fp)
 
     print("-> done!")
 
