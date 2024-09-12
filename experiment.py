@@ -9,7 +9,7 @@ from randmmu import RandMMU
 
 PAGE_OFFSET = 12  # page is 2^12 = 4KB
 MAX_INCREMENTS = (
-    10  # Maximum number of increments (of cache sizes) that each trace will runn
+    1000  # Maximum number of increments (of cache sizes) that each trace will run
 )
 FRAME_TABLE_MULTIPLE = 1.2  # The multiple that determines any "extra" space in the maximum frame table size
 DATA_FP = "data.json"
@@ -96,7 +96,7 @@ def plot_results(name, data_fp):
     plt.close()
 
 
-file_names = ["bzip", "sixpack", "swim", "gcc"]
+file_names = ["gcc"]
 traces = []
 
 for file_name in file_names:
