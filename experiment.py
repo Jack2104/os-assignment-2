@@ -13,6 +13,7 @@ MAX_INCREMENTS = (
 )
 FRAME_TABLE_MULTIPLE = 1.2  # The multiple that determines any "extra" space in the maximum frame table size
 DATA_FP = "data.json"
+FRAME_MIN = 100
 
 
 class Trace:
@@ -72,16 +73,26 @@ class Trace:
         plt.close()
 
 
-def plot_results(name, data_fp):
+def plot_results(name, data_fp, min_frames):
     data = {}
 
     with open(data_fp, "r") as data_file:
         data = json.load(data_file)
 
-    increments = data[name]["increments"]
-    rand_results = data[name]["rand"]
-    lru_results = data[name]["lru"]
-    clock_results = data[name]["clock"]
+    curr_start_frame = 0
+    curr_start_index = 0
+
+    for count in increments:
+        if curr_start_frame <= min_frames:
+            break
+
+        curr_start_index += 1
+        curr_start_frame += count
+
+    increments = data[name]["increments"][curr_start_index::]
+    rand_results = data[name]["rand"][curr_start_index::]
+    lru_results = data[name]["lru"][curr_start_index::]
+    clock_results = data[name]["clock"][curr_start_index::]
 
     plt.plot(increments, rand_results, label="rand")
     plt.plot(increments, lru_results, label="lru")
