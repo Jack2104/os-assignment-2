@@ -47,7 +47,7 @@ def plot_results(name, data_fp, min_frames):
     plt.ylabel("Page Fault Rate (%)")
     plt.legend(loc="upper right")
 
-    plt.savefig(f"{name}_plot_{FRAME_MIN}.png", bbox_inches="tight")
+    plt.savefig(f"{name}_plot_constrained.png", bbox_inches="tight")
     plt.close()
 
 

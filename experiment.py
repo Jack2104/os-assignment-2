@@ -113,7 +113,7 @@ traces = []
 for file_name in file_names:
     curr_traces = []
 
-    with gzip.open(file_name + ".trace.gz", "rt") as file:
+    with gzip.open("traces/" + file_name + ".trace.gz", "rt") as file:
         for trace_line in file:
             curr_trace = trace_line.split()
 
@@ -160,7 +160,7 @@ for trace in traces:
         "clock": trace.clock_results,
     }
 
-    data_fp = trace.name + "_data.json"
+    data_fp = "data/" + trace.name + "_data.json"
 
     with open(data_fp, "w") as f:
         json.dump(data, f, indent=4)
